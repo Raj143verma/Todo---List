@@ -5,7 +5,7 @@
  * @returns {string} Fully styled HTML email string
  */
 const wrapLayout = (title, contentHTML) => {
-  const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const clientUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '') || '/';
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -237,7 +237,7 @@ const getTaskReminderTemplate = (tasks, stats = {}) => {
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tr>
         <td align="center">
-          <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/todos" style="display: inline-block; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #ffffff; text-decoration: none; padding: 13px 28px; font-size: 15px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">Open Workspace</a>
+          <a href="${(process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '') || '/'}${(process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '') ? '/todos' : '/todos'}" style="display: inline-block; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #ffffff; text-decoration: none; padding: 13px 28px; font-size: 15px; font-weight: 600; border-radius: 8px; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.2);">Open Workspace</a>
         </td>
       </tr>
     </table>

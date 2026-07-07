@@ -70,7 +70,10 @@ const registerUser = async (req, res, next) => {
       await sendWelcomeEmail(user.email, user.name);
 
       // Send Verification Email
-      const verificationLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/verify-email?token=${verificationToken}`;
+      const clientBaseUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '');
+      const verificationLink = clientBaseUrl
+        ? `${clientBaseUrl}/verify-email?token=${verificationToken}`
+        : `/verify-email?token=${verificationToken}`;
       await sendEmailVerification(user.email, verificationLink);
 
       res.status(201).json({
@@ -193,7 +196,10 @@ const forgotPassword = async (req, res, next) => {
 
     await user.save();
 
-    const resetLink = `${process.env.CLIENT_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
+    const clientBaseUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '');
+    const resetLink = clientBaseUrl
+      ? `${clientBaseUrl}/reset-password?token=${resetToken}`
+      : `/reset-password?token=${resetToken}`;
     
     // Log the request
     console.log(`🔑 Password reset requested for: ${email}`);

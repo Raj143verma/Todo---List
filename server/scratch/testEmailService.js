@@ -28,13 +28,13 @@ const runTests = async () => {
 
   console.log('--------------------------------------------------');
   console.log(`📨 [Test 2] Dispatching Password Reset Email to: ${testEmail}`);
-  const resetLink = 'http://localhost:5173/reset-password?token=test_reset_token_987654';
+  const resetLink = `${process.env.CLIENT_URL || process.env.FRONTEND_URL || '/'}reset-password?token=test_reset_token_987654`;
   const resetResult = await sendPasswordResetEmail(testEmail, resetLink);
   console.log(`Result: ${resetResult ? 'SENT ✅' : 'CONSOLE FALLBACK/BLOCKED ❌'}`);
 
   console.log('--------------------------------------------------');
   console.log(`📨 [Test 3] Dispatching Email Verification to: ${testEmail}`);
-  const verificationLink = 'http://localhost:5173/verify-email?token=test_verification_token_123456';
+  const verificationLink = `${process.env.CLIENT_URL || process.env.FRONTEND_URL || '/'}verify-email?token=test_verification_token_123456`;
   const verificationResult = await sendEmailVerification(testEmail, verificationLink);
   console.log(`Result: ${verificationResult ? 'SENT ✅' : 'CONSOLE FALLBACK/BLOCKED ❌'}`);
 

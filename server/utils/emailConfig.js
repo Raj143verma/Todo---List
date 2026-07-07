@@ -102,5 +102,5 @@ module.exports = {
   getTransporter,
   fromName: process.env.EMAIL_FROM_NAME || 'Todo SaaS',
   fromAddress: process.env.EMAIL_FROM_ADDRESS || 'noreply@todosaas.com',
-  clientUrl: process.env.CLIENT_URL || 'http://localhost:5173',
+  clientUrl: (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '') || '/',
 };

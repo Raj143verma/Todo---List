@@ -1,4 +1,6 @@
-export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = import.meta.env.VITE_API_URL?.trim();
+
+export const API_URL = rawApiUrl ? rawApiUrl.replace(/\/$/, '') : '/api';
 
 export const CATEGORIES = ['study', 'work', 'personal', 'health'];
 

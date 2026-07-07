@@ -21,11 +21,28 @@ app.use(helmet());
 // Request Parsing
 app.use(express.json());
 
+const getAllowedOrigins = () => {
+  const configuredOrigins = [process.env.CLIENT_URL, process.env.FRONTEND_URL]
+    .filter(Boolean)
+    .map((origin) => origin.trim().replace(/\/$/, ''));
+
+  return Array.from(new Set([...configuredOrigins, 'http://localhost:5173', 'http://127.0.0.1:5173']));
+};
+
 // Enable CORS
 app.use(
   cors({
-    origin: '*', // For development flexibility; restrict in production
+    origin: (origin, callback) => {
+      if (!origin || getAllowedOrigins().includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(null, false);
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 

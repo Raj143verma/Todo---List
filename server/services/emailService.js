@@ -122,7 +122,7 @@ const sendMailHelper = async (to, subject, htmlContent, type) => {
  * @returns {Promise<boolean>}
  */
 const sendWelcomeEmail = async (email, name) => {
-  const getStartedUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+  const getStartedUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '') || '/';
   const htmlContent = getWelcomeTemplate(name, getStartedUrl);
   return sendMailHelper(email, '🎉 Welcome to Todo SaaS!', htmlContent, 'welcome');
 };
