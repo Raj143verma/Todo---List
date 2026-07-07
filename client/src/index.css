@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply transition-colors duration-200;
+  }
+}
+
+/* Premium Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.45);
+}
+
+/* React Big Calendar Premium Dark/Light UI Customizations */
+.rbc-calendar {
+  @apply font-sans border-0 !important;
+  min-height: 550px;
+}
+
+.rbc-header {
+  @apply font-semibold text-xs uppercase tracking-wider py-3 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 !important;
+}
+
+.rbc-month-view, .rbc-time-view {
+  @apply border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden bg-white dark:bg-cardDark !important;
+}
+
+.rbc-day-bg + .rbc-day-bg, .rbc-month-row + .rbc-month-row, .rbc-time-content > * + * {
+  @apply border-slate-200 dark:border-slate-700 !important;
+}
+
+.rbc-month-row {
+  @apply border-b border-slate-200 dark:border-slate-700 !important;
+}
+
+.rbc-day-bg {
+  @apply border-r border-slate-200 dark:border-slate-700 !important;
+}
+
+.rbc-today {
+  @apply bg-indigo-50/20 dark:bg-indigo-950/15 !important;
+}
+
+.rbc-off-range-bg {
+  @apply bg-slate-50/40 dark:bg-slate-900/20 !important;
+}
+
+.rbc-event {
+  @apply rounded-lg py-1.5 px-2 text-xs font-semibold shadow-sm border-0 transition-all hover:scale-[1.02] !important;
+}
+
+.rbc-event:focus {
+  @apply outline-none ring-2 ring-primary !important;
+}
+
+.rbc-event-content {
+  @apply text-white truncate !important;
+}
+
+.rbc-show-more {
+  @apply font-bold text-xs text-primary dark:text-indigo-400 bg-transparent hover:underline !important;
+}
+
+.rbc-toolbar button {
+  @apply border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm font-semibold transition-all bg-white dark:bg-cardDark text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 active:scale-95 !important;
+}
+
+.rbc-toolbar button.rbc-active {
+  @apply bg-primary hover:bg-primary-hover text-white border-primary hover:border-primary-hover shadow-sm !important;
+}
+
+.rbc-toolbar {
+  @apply flex flex-col sm:flex-row justify-between items-center mb-6 gap-3 !important;
+}
+
+.rbc-toolbar-label {
+  @apply font-bold text-lg sm:text-xl text-slate-800 dark:text-slate-100 py-1 !important;
+}
+
+.rbc-btn-group {
+  @apply flex items-center gap-1 !important;
+}
+
+/* React Big Calendar specific month cells height constraint */
+.rbc-month-row {
+  min-height: 80px;
+}

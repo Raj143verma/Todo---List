@@ -1,0 +1,22 @@
+# Dependencies
+client/node_modules/
+server/node_modules/
+
+# Environment Variables
+client/.env
+server/.env
+
+# Build
+client/dist/
+server/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
