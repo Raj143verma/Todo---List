@@ -66,15 +66,18 @@ const registerUser = async (req, res, next) => {
     });
 
     if (user) {
-      // Send Welcome Email (failures caught inside the service function)
-      await sendWelcomeEmail(user.email, user.name);
-
-      // Send Verification Email
       const clientBaseUrl = (process.env.CLIENT_URL || process.env.FRONTEND_URL || '').replace(/\/$/, '');
       const verificationLink = clientBaseUrl
         ? `${clientBaseUrl}/verify-email?token=${verificationToken}`
         : `/verify-email?token=${verificationToken}`;
-      await sendEmailVerification(user.email, verificationLink);
+
+      // Dispatch welcome and verification emails in background without blocking the HTTP response
+      Promise.all([
+        sendWelcomeEmail(user.email, user.name),
+        sendEmailVerification(user.email, verificationLink),
+      ]).catch((emailErr) => {
+        console.error('Non-blocking registration email error:', emailErr);
+      });
 
       res.status(201).json({
         success: true,

@@ -31,7 +31,11 @@ export default function LoginForm({ onSuccess }) {
         toast.error(result.message || 'Login failed');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Invalid email or password credentials');
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        'Unable to reach server. Please check your network or backend connection.';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }

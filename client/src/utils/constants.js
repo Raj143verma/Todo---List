@@ -1,4 +1,17 @@
-export const API_URL = import.meta.env.VITE_API_URL;
+const getApiUrl = () => {
+  let url = import.meta.env.VITE_API_URL;
+  if (!url || typeof url !== 'string' || !url.trim()) {
+    return import.meta.env.DEV ? 'http://localhost:5000/api' : '/api';
+  }
+
+  url = url.trim().replace(/\/+$/, '');
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
+export const API_URL = getApiUrl();
 
 export const CATEGORIES = ['study', 'work', 'personal', 'health'];
 

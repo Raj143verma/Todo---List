@@ -90,7 +90,12 @@ const getTransporter = () => {
   }
 
   try {
-    return nodemailer.createTransport(config);
+    return nodemailer.createTransport({
+      ...config,
+      connectionTimeout: 8000, // 8s connection timeout
+      greetingTimeout: 5000,   // 5s greeting timeout
+      socketTimeout: 10000,    // 10s socket timeout
+    });
   } catch (error) {
     console.error('❌ [Email Config Error] Failed to create nodemailer transporter:', error);
     return null;

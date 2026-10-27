@@ -31,7 +31,11 @@ export default function SignupForm({ onSuccess }) {
         toast.error(result.message || 'Registration failed');
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Email already exists or signup parameters incorrect');
+      const errorMsg =
+        error.response?.data?.message ||
+        error.message ||
+        'Unable to reach server. Please check your network or backend connection.';
+      toast.error(errorMsg);
     } finally {
       setLoading(false);
     }
