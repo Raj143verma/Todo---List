@@ -61,7 +61,12 @@ const getTodos = async (req, res, next) => {
 // @access  Private
 const createTodo = async (req, res, next) => {
   try {
-    const { title, description, priority, category, dueDate } = req.body;
+    let { title, description, priority, category, dueDate } = req.body;
+
+    // Sanitize dueDate: empty string or invalid values converted to null
+    if (!dueDate || dueDate === '' || dueDate === 'null' || dueDate === 'undefined') {
+      dueDate = null;
+    }
 
     // Find the current highest order value for this user's todos
     const maxOrderTodo = await Todo.findOne({ user: req.user._id })
@@ -108,13 +113,17 @@ const getTodoById = async (req, res, next) => {
 // @access  Private
 const updateTodo = async (req, res, next) => {
   try {
-    const { title, description, priority, category, dueDate, completed } = req.body;
+    let { title, description, priority, category, dueDate, completed } = req.body;
 
     const todo = await Todo.findOne({ _id: req.params.id, user: req.user._id });
 
     if (!todo) {
       res.status(404);
       throw new Error('Todo not found');
+    }
+
+    if (dueDate === '' || dueDate === 'null' || dueDate === 'undefined') {
+      dueDate = null;
     }
 
     todo.title = title !== undefined ? title : todo.title;
@@ -125,7 +134,6 @@ const updateTodo = async (req, res, next) => {
     
     if (completed !== undefined) {
       todo.completed = completed;
-      // The schema pre-save hook will also set completedAt, but we can set it explicitly here too
       todo.completedAt = completed ? new Date() : null;
     }
 
@@ -240,10 +248,15 @@ const getTodoStats = async (req, res, next) => {
       const startOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
       const endOfDay = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
-      const count = await Todo.countDocuments({
+      const completedCount = await Todo.countDocuments({
         user: userId,
         completed: true,
         completedAt: { $gte: startOfDay, $lte: endOfDay },
+      });
+
+      const createdCount = await Todo.countDocuments({
+        user: userId,
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
       });
 
       const dayLabel = d.toLocaleDateString('en-US', { weekday: 'short' });
@@ -252,7 +265,8 @@ const getTodoStats = async (req, res, next) => {
       productivityStats.push({
         day: dayLabel,
         date: dateStr,
-        completed: count,
+        created: createdCount,
+        completed: completedCount,
       });
     }
 

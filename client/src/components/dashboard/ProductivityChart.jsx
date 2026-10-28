@@ -20,15 +20,17 @@ export default function ProductivityChart({ barData = [], pieData = [] }) {
     Health: '#EC4899', // Pink
   };
 
-  const CustomTooltip = ({ active, payload }) => {
+  const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="rounded-xl border border-slate-150 bg-white/95 dark:bg-slate-800 dark:border-slate-700 p-3 shadow-lg backdrop-blur-sm">
-          <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
-            {payload[0].name === 'completed'
-              ? `${payload[0].value} Tasks Completed`
-              : `${payload[0].name}: ${payload[0].value}`}
-          </p>
+        <div className="rounded-xl border border-slate-150 bg-white/95 dark:bg-slate-800 dark:border-slate-700 p-3 shadow-lg backdrop-blur-sm space-y-1">
+          <p className="text-xs font-bold text-slate-800 dark:text-slate-100">{label}</p>
+          {payload.map((item, idx) => (
+            <p key={idx} className="text-xs font-semibold flex items-center gap-1.5" style={{ color: item.color || item.fill }}>
+              <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: item.color || item.fill }}></span>
+              <span>{item.name}: {item.value}</span>
+            </p>
+          ))}
         </div>
       );
     }
@@ -37,15 +39,27 @@ export default function ProductivityChart({ barData = [], pieData = [] }) {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Bar Chart: Last 7 Days Completed Tasks */}
+      {/* Bar Chart: Last 7 Days Tasks */}
       <div className="lg:col-span-2 rounded-2xl border border-slate-100 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-cardDark">
-        <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 mb-6 uppercase tracking-wider">
-          Productivity (Last 7 Days)
-        </h3>
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+            Activity & Productivity (Last 7 Days)
+          </h3>
+          <div className="flex items-center gap-3 text-[11px] font-semibold">
+            <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-sm bg-indigo-500 inline-block"></span>
+              Created
+            </span>
+            <span className="flex items-center gap-1 text-slate-600 dark:text-slate-300">
+              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span>
+              Completed
+            </span>
+          </div>
+        </div>
         
         {barData.length === 0 ? (
           <div className="flex h-[240px] items-center justify-center text-slate-400">
-            <span className="text-xs font-semibold">No completed tasks logged yet</span>
+            <span className="text-xs font-semibold">No tasks logged yet</span>
           </div>
         ) : (
           <div className="h-[240px] w-full">
@@ -67,10 +81,18 @@ export default function ProductivityChart({ barData = [], pieData = [] }) {
                 />
                 <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.04)' }} />
                 <Bar
-                  dataKey="completed"
+                  dataKey="created"
+                  name="Created"
                   fill="#6366F1"
-                  radius={[6, 6, 0, 0]}
-                  maxBarSize={40}
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={24}
+                />
+                <Bar
+                  dataKey="completed"
+                  name="Completed"
+                  fill="#10B981"
+                  radius={[4, 4, 0, 0]}
+                  maxBarSize={24}
                 />
               </BarChart>
             </ResponsiveContainer>

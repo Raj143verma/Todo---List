@@ -12,14 +12,12 @@ import { formatDate } from '../utils/helpers';
 
 
 export default function DashboardPage() {
-  const { stats, fetchStats, offline } = useTodos();
+  const { stats, fetchStats, fetchTodos, offline } = useTodos();
   const { user } = useAuth();
-
-
-
 
   useEffect(() => {
     fetchStats();
+    fetchTodos();
   }, []);
 
   return (
@@ -98,6 +96,7 @@ export default function DashboardPage() {
                     <th className="py-3">Task Title</th>
                     <th className="py-3">Category</th>
                     <th className="py-3">Priority</th>
+                    <th className="py-3">Created</th>
                     <th className="py-3">Due Date</th>
                     <th className="py-3 text-right">Status</th>
                   </tr>
@@ -113,6 +112,9 @@ export default function DashboardPage() {
                       </td>
                       <td className="py-3.5">
                         <Badge variant={todo.priority}>{todo.priority}</Badge>
+                      </td>
+                      <td className="py-3.5 text-slate-500 dark:text-slate-400 font-medium">
+                        {todo.createdAt ? formatDate(todo.createdAt) : 'Recently'}
                       </td>
                       <td className="py-3.5 text-slate-400 dark:text-slate-500">
                         {todo.dueDate ? formatDate(todo.dueDate) : 'No due date'}

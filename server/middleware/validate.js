@@ -38,7 +38,15 @@ const validateTodo = [
   check('priority', 'Priority must be one of: high, medium, low')
     .optional()
     .isIn(['high', 'medium', 'low']),
-  check('dueDate', 'Due date must be a valid ISO8601 date').optional({ nullable: true, checkFalsy: true }).isISO8601(),
+  check('dueDate')
+    .optional({ nullable: true, checkFalsy: true })
+    .custom((val) => {
+      if (!val || val === '' || val === null) return true;
+      if (isNaN(Date.parse(val))) {
+        throw new Error('Due date must be a valid date');
+      }
+      return true;
+    }),
   handleValidationErrors,
 ];
 

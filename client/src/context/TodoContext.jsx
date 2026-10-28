@@ -99,6 +99,36 @@ export const TodoProvider = ({ children }) => {
       const activeFilters = { ...state.filters, ...customFilters };
       const response = await todoService.getTodos(activeFilters);
       if (response.success) {
+        // Sync any temporary offline tasks that were created during connection drops
+        const cached = localStorage.getItem(STORAGE_KEYS.TODOS_BACKUP);
+        if (cached) {
+          try {
+            const cachedTodos = JSON.parse(cached);
+            const pendingOffline = cachedTodos.filter(
+              (t) => typeof t._id === 'string' && t._id.startsWith('temp-')
+            );
+            if (pendingOffline.length > 0) {
+              for (const item of pendingOffline) {
+                const { _id, createdAt, ...cleanTodo } = item;
+                await todoService.createTodo(cleanTodo);
+              }
+              // Clean out the temp items from backup
+              const cleaned = cachedTodos.filter(
+                (t) => !(typeof t._id === 'string' && t._id.startsWith('temp-'))
+              );
+              localStorage.setItem(STORAGE_KEYS.TODOS_BACKUP, JSON.stringify(cleaned));
+              
+              const refreshed = await todoService.getTodos(activeFilters);
+              if (refreshed.success) {
+                dispatch({ type: 'FETCH_SUCCESS', payload: refreshed.data });
+                return;
+              }
+            }
+          } catch (syncErr) {
+            console.warn('Auto-sync offline tasks error:', syncErr);
+          }
+        }
+
         dispatch({ type: 'FETCH_SUCCESS', payload: response.data });
       }
     } catch (error) {
@@ -202,8 +232,13 @@ export const TodoProvider = ({ children }) => {
   };
 
   const createTodo = async (todoData) => {
+    const cleanData = {
+      ...todoData,
+      dueDate: todoData.dueDate ? todoData.dueDate : null,
+    };
+
     try {
-      const response = await todoService.createTodo(todoData);
+      const response = await todoService.createTodo(cleanData);
       if (response.success) {
         dispatch({ type: 'ADD_TODO', payload: response.data });
         toast.success('Task created successfully!');
@@ -211,28 +246,45 @@ export const TodoProvider = ({ children }) => {
         return response.data;
       }
     } catch (error) {
-      const newTodo = {
-        _id: `temp-${Date.now()}`,
-        ...todoData,
-        completed: false,
-        order: state.todos.length,
-        createdAt: new Date().toISOString(),
-      };
-      
-      const cached = localStorage.getItem(STORAGE_KEYS.TODOS_BACKUP);
-      const list = cached ? JSON.parse(cached) : [];
-      list.push(newTodo);
-      localStorage.setItem(STORAGE_KEYS.TODOS_BACKUP, JSON.stringify(list));
+      console.error('Task creation failed:', error);
+      const errorMsg =
+        error.response?.data?.errors?.[0]?.message ||
+        error.response?.data?.message ||
+        error.message;
 
-      dispatch({ type: 'ADD_TODO', payload: newTodo });
-      toast.success('Saved locally (Offline mode)');
-      return newTodo;
+      // Only enter offline fallback if network is unreachable
+      if (!error.response) {
+        const newTodo = {
+          _id: `temp-${Date.now()}`,
+          ...cleanData,
+          completed: false,
+          order: state.todos.length,
+          createdAt: new Date().toISOString(),
+        };
+
+        const cached = localStorage.getItem(STORAGE_KEYS.TODOS_BACKUP);
+        const list = cached ? JSON.parse(cached) : [];
+        list.push(newTodo);
+        localStorage.setItem(STORAGE_KEYS.TODOS_BACKUP, JSON.stringify(list));
+
+        dispatch({ type: 'ADD_TODO', payload: newTodo });
+        toast.success('Saved locally (Offline mode)');
+        return newTodo;
+      } else {
+        toast.error(errorMsg || 'Failed to create task');
+        throw error;
+      }
     }
   };
 
   const updateTodo = async (id, todoData) => {
+    const cleanData = {
+      ...todoData,
+      dueDate: todoData.dueDate ? todoData.dueDate : null,
+    };
+
     try {
-      const response = await todoService.updateTodo(id, todoData);
+      const response = await todoService.updateTodo(id, cleanData);
       if (response.success) {
         dispatch({ type: 'UPDATE_TODO', payload: response.data });
         toast.success('Task updated!');
@@ -240,16 +292,25 @@ export const TodoProvider = ({ children }) => {
         return response.data;
       }
     } catch (error) {
-      const cached = localStorage.getItem(STORAGE_KEYS.TODOS_BACKUP);
-      if (cached) {
-        let list = JSON.parse(cached);
-        list = list.map((t) => (t._id === id ? { ...t, ...todoData } : t));
-        localStorage.setItem(STORAGE_KEYS.TODOS_BACKUP, JSON.stringify(list));
-        
-        const updated = list.find((t) => t._id === id);
-        dispatch({ type: 'UPDATE_TODO', payload: updated });
-        toast.success('Updated locally (Offline mode)');
-        return updated;
+      if (!error.response) {
+        const cached = localStorage.getItem(STORAGE_KEYS.TODOS_BACKUP);
+        if (cached) {
+          let list = JSON.parse(cached);
+          list = list.map((t) => (t._id === id ? { ...t, ...cleanData } : t));
+          localStorage.setItem(STORAGE_KEYS.TODOS_BACKUP, JSON.stringify(list));
+
+          const updated = list.find((t) => t._id === id);
+          dispatch({ type: 'UPDATE_TODO', payload: updated });
+          toast.success('Updated locally (Offline mode)');
+          return updated;
+        }
+      } else {
+        const errorMsg =
+          error.response?.data?.errors?.[0]?.message ||
+          error.response?.data?.message ||
+          error.message;
+        toast.error(errorMsg || 'Failed to update task');
+        throw error;
       }
     }
   };
