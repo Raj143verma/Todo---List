@@ -79,9 +79,13 @@ export default function Sidebar({ isOpen, onClose }) {
             <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
               <div className="flex items-center gap-3">
                 <img
-                  src={user.avatar}
+                  src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`}
                   alt={user.name}
-                  className="w-9 h-9 rounded-full bg-slate-200"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=6366f1&color=fff`;
+                  }}
+                  className="w-9 h-9 rounded-full bg-slate-200 object-cover"
                 />
                 <div className="flex flex-col">
                   <span className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate max-w-[110px]">

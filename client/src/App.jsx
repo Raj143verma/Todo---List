@@ -12,6 +12,8 @@ import TodosPage from './pages/TodosPage';
 import CalendarPage from './pages/CalendarPage';
 import PomodoroPage from './pages/PomodoroPage';
 import LandingPage from './pages/LandingPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import Spinner from './components/ui/Spinner';
 
 // Route protection for private pages
@@ -79,6 +81,8 @@ export default function App() {
                   </PublicRoute>
                 }
               />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
 
               {/* Protected Application Routes */}
               <Route

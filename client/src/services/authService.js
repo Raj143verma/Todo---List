@@ -17,6 +17,18 @@ const authService = {
     const response = await api.post('/auth/logout');
     return response.data;
   },
+  forgotPassword: async (email) => {
+    const response = await api.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+  resetPassword: async (token, password) => {
+    const response = await api.post('/auth/reset-password', { token, password });
+    return response.data;
+  },
+  verifyEmail: async (token) => {
+    const response = await api.post('/auth/verify-email', { token });
+    return response.data;
+  },
 };
 
 export default authService;

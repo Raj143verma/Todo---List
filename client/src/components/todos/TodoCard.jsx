@@ -84,7 +84,7 @@ export default function TodoCard({
             </h4>
             
             {/* Contextual Action Overlay Buttons */}
-            <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 transition-opacity duration-150 shrink-0">
+            <div className="opacity-100 sm:opacity-0 sm:group-hover:opacity-100 flex items-center gap-1.5 transition-opacity duration-150 shrink-0">
               <button
                 onClick={() => onEdit(todo)}
                 className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-colors"
